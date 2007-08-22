@@ -63,7 +63,7 @@ def netstat():
             
     return retval
             
-def checkport(*ports):
+def portcheck(*ports):
     """
     check a list of ports seeing if any of them are being used
     returns a dictionary with keys of the ports used
@@ -86,12 +86,12 @@ def checkport(*ports):
 
     return retval
 
-def killport(*ports):
+def portkill(*ports):
     """
     kill processes by ports
     """
 
-    ports = checkport(*ports)
+    ports = portcheck(*ports)
 
     for i in ports:
         if ports[i]:
@@ -100,8 +100,3 @@ def killport(*ports):
             return False # can't determine PID
 
     return True
-
-if __name__ == '__main__':
-    if not killport(*sys.argv[1:]):
-        sys.exit(1)
-        
