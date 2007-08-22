@@ -14,7 +14,6 @@ setup(name='portutils',
       author_email='jhammel@openplans.org',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
-      namespace_packages=['topp'],
       include_package_data=True,
       zip_safe=False,
       entry_points="""
