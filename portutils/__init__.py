@@ -1,5 +1,6 @@
 # entry points
 
+import sys
 from portutils import portcheck, portkill
 
 def portcheck_main(args=sys.argv[1:]):
