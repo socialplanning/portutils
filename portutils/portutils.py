@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-import sys
 import subprocess
+import sys
+import time
 
 def netstat():
     """
@@ -90,13 +91,17 @@ def portkill(*ports):
     """
     kill processes by ports
     """
-
-    ports = portcheck(*ports)
-
-    for i in ports:
-        if ports[i]:
-            subprocess.call(['kill', '-9', ports[i]])
+    signalled = False
+    for signal in range(2, 10):
+        ports = portcheck(*ports)
+        processes = [p for p in ports.values() if p]
+        if processes:
+            cmd = ['kill', '-%d' % signal] + processes
+            #print ' '.join(cmd)
+            subprocess.call(['kill', '-%d' % signal] + processes)
+            signalled = True
+            # Give things a bit of a chance to exit gracefully.
+            time.sleep(0.1)
         else:
-            return False # can't determine PID
-
-    return True
+            break
+    return signalled
