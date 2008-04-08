@@ -91,7 +91,6 @@ def portkill(*ports):
     """
     kill processes by ports
     """
-    signalled = False
     for signal in range(2, 10):
         ports = portcheck(*ports)
         processes = [p for p in ports.values() if p]
@@ -99,9 +98,7 @@ def portkill(*ports):
             cmd = ['kill', '-%d' % signal] + processes
             #print ' '.join(cmd)
             subprocess.call(['kill', '-%d' % signal] + processes)
-            signalled = True
             # Give things a bit of a chance to exit gracefully.
             time.sleep(0.1)
         else:
             break
-    return signalled

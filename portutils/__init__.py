@@ -12,5 +12,6 @@ def portcheck_main(args=sys.argv[1:]):
         
 def portkill_main(args=sys.argv[1:]):
     """commandline front-end to portkill"""
-    return int(not portkill(*args))
+    portkill(*args)
+    return 0
     
