@@ -87,18 +87,22 @@ def portcheck(*ports):
 
     return retval
 
-def portkill(*ports):
+def portkill(*ports, **kw):
     """
     kill processes by ports
     """
+    verbose = kw.get('verbose')
     for signal in range(2, 10):
         ports = portcheck(*ports)
         processes = [p for p in ports.values() if p]
         if processes:
             cmd = ['kill', '-%d' % signal] + processes
-            #print ' '.join(cmd)
+            if verbose:
+                print 'running:', ' '.join(cmd)
             subprocess.call(['kill', '-%d' % signal] + processes)
             # Give things a bit of a chance to exit gracefully.
-            time.sleep(0.1)
+            time.sleep(0.2)
         else:
+            if verbose:
+                print "no processes left on those ports"
             break
