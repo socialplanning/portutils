@@ -99,9 +99,9 @@ def portkill(*ports, **kw):
             cmd = ['kill', '-%d' % signal] + processes
             if verbose:
                 print 'running:', ' '.join(cmd)
-            subprocess.call(['kill', '-%d' % signal] + processes)
+            subprocess.call(cmd)
             # Give things a bit of a chance to exit gracefully.
-            time.sleep(0.2)
+            time.sleep(0.5)
         else:
             if verbose:
                 print "no processes left on those ports"
