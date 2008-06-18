@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import subprocess
 import sys
 import time
@@ -87,22 +88,60 @@ def portcheck(*ports):
 
     return retval
 
+
+
+# Just to be explicit about the signalls we'll use to kill things...
+# most of these are of dubious relevance, but in practice, it's
+# generally good to try almost anything other than 9 before trying 9.
+import signal
+signals = (
+    signal.SIGTERM,  # 15, terminate but allow cleanup handlers.
+    signal.SIGINT,   # 2, Ctrl-C
+    signal.SIGQUIT,  # 3, quit and dump core
+    signal.SIGILL,   # 4, illegal instruction
+    #signal.SIGTRAP,  # 5, trace/breakpoint trap
+    signal.SIGABRT, # 6, process aborted. "the current operation
+                    # cannot be completed but the main program can
+                    # perform cleanup before exiting."
+    signal.SIGBUS, # 7, bus error (improper memory handling)
+    signal.SIGFPE, # 8, float exception 
+    signal.SIGKILL # 9, kill
+)
+
 def portkill(*ports, **kw):
     """
     kill processes by ports
     """
     verbose = kw.get('verbose')
-    for signal in range(2, 10):
-        ports = portcheck(*ports)
-        processes = [p for p in ports.values() if p]
-        if processes:
-            cmd = ['kill', '-%d' % signal] + processes
-            if verbose:
-                print 'running:', ' '.join(cmd)
-            subprocess.call(cmd)
-            # Give things a bit of a chance to exit gracefully.
-            time.sleep(0.5)
-        else:
-            if verbose:
-                print "no processes left on those ports"
+    sleeptime = float(kw.get('sleeptime', 0.5))
+    
+    for sig in signals:
+        process_info = portcheck(*ports)
+        if not process_info:
             break
+        for port, pid in process_info.items():
+            if not pid and port:
+                continue
+            pid = int(pid)
+            port = int(port)
+            # Kill the whole process group. This should help
+            # with parent or child processes that don't directly touch the port.
+            try:
+                pgid = os.getpgid(pid)
+                if verbose:
+                    print "Sending signal %d to process group %d (pid %d, port %d)" % (
+                        sig, pgid, pid, port)
+                os.killpg(pgid, sig)
+            except OSError:
+                try:
+                    if verbose:
+                        print "Sending signal %d to pid %d (port %d)" % (sig, pid, port)
+                    os.kill(pid, sig)
+                except OSError:
+                    if verbose:
+                        print "Nothing to kill at pid %d (port %d)" % (pid, port)
+        if verbose:
+            print" Sleeping %f before trying again." % sleeptime
+        time.sleep(sleeptime)
+    if verbose:
+        print "No processes left to kill."
