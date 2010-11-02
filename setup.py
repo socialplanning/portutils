@@ -5,15 +5,15 @@ version = '0.0'
 
 setup(name='portutils',
       version=version,
-      description="",
+      description="Find processes given a port number and kill them",
       long_description="""
 this is basically a front-end to netstat that will find processes
 given a port number (portcheck) and kill them (portkill)      
 """,
-      classifiers=[], # Get strings from http://www.python.org/pypi?%3Aaction=list_classifiers
-      keywords='topp openplans',
-      author='The Open Planning Project',
-      author_email='jhammel@openplans.org',
+      classifiers=[],
+      keywords='opencore',
+      author='Jeff Hammel',
+      author_email='opencore-dev at lists.coactivate.org',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
       include_package_data=True,
